@@ -393,10 +393,6 @@
 const RATES_URL =
   'https://cubbycargo.github.io/FCl-rates/rates.json';
 
-const QUOTE_REF_URL =
-  'https://script.google.com/macros/s/AKfycbyL5XF7erLc_OPVoAHS4mGTENGSDXalSb_ok19K6fVX0Z7ed-RZlnfJ3tw_-HnScV_kxg/exec';
-
-
 function clean(value) {
   return String(value || '')
     .trim()
@@ -431,7 +427,7 @@ function today() {
 
 function getParams() {
 
-  const params =
+const params =
     new URLSearchParams(
       window.location.search
     );
@@ -451,6 +447,9 @@ function getParams() {
 
     carrier:
       params.get('carrier') || '',
+
+    ref:
+      params.get('ref') || '',
 
     insurance:
       clean(params.get('insurance')) === 'true'
@@ -530,36 +529,6 @@ function findRate(data, request) {
 
   return null;
 }
-
-
-async function getQuoteRef() {
-
-  try {
-
-    const response =
-      await fetch(
-        QUOTE_REF_URL,
-        {
-          redirect: 'follow'
-        }
-      );
-
-    const data =
-      await response.json();
-
-    return data.ref || 'Pending';
-
-  } catch (err) {
-
-    console.warn(
-      'Quote reference unavailable:',
-      err
-    );
-
-    return 'Pending';
-  }
-}
-
 
 function renderCharges(
   rate,
@@ -757,6 +726,10 @@ async function loadQuote() {
     ).textContent =
       request.preparedFor;
 
+    document.getElementById(
+      'quote-ref'
+    ).textContent =
+      request.ref || '—';
 
     document.getElementById(
       'pol'
@@ -813,21 +786,6 @@ async function loadQuote() {
     document.getElementById(
       'quote'
     ).style.display = 'block';
-
-
-    /*
-     * Quote reference does NOT block
-     * the quotation from loading.
-     */
-
-    const ref =
-      await getQuoteRef();
-
-
-    document.getElementById(
-      'quote-ref'
-    ).textContent = ref;
-
 
   } catch (err) {
 
