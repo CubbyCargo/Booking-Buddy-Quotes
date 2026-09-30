@@ -459,7 +459,7 @@ const params =
 
 function portMatches(ratePol, requestedPol) {
 
-   if (!requestedPorts) {
+if (!requestedPorts) {
     return true;
   }
 
@@ -476,8 +476,7 @@ function portMatches(ratePol, requestedPol) {
       .filter(Boolean);
 
   return requestedList.some(
-    requested =>
-      rateList.includes(requested)
+    requested => rateList.includes(requested)
   );
 }
 
