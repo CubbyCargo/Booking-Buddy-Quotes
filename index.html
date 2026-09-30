@@ -477,50 +477,53 @@ function portMatches(ratePol, requestedPol) {
 
 function findRate(data, request) {
 
-  const lanes =
-    Array.isArray(data)
-      ? data
-      : (data.lanes || []);
+  const destinations = data.destinations || {};
 
-  for (const lane of lanes) {
+  for (const destination of Object.values(destinations)) {
 
-    for (const rate of lane.rates || []) {
+    for (const rates of Object.values(destination)) {
 
-      const containerMatch =
-        clean(rate.container) ===
-        clean(request.container);
+      for (const rate of rates) {
 
-      const carrierMatch =
-        clean(rate.carrier) ===
-        clean(request.carrier);
+        const containerMatch =
+          clean(rate.size) ===
+          clean(request.container);
 
-      const podMatch =
-        !request.pod ||
-        clean(rate.pod) ===
-        clean(request.pod);
+        const carrierMatch =
+          clean(rate.carrier) ===
+          clean(request.carrier);
 
-      const polMatch =
-        portMatches(
-          rate.pol,
-          request.pol
-        );
+        const podMatch =
+          !request.pod ||
+          portMatches(rate.pod, request.pod);
 
-      if (
-        containerMatch &&
-        carrierMatch &&
-        podMatch &&
-        polMatch
-      ) {
+        const polMatch =
+          portMatches(rate.pol, request.pol);
 
-        return {
-          ...rate,
+        if (
+          containerMatch &&
+          carrierMatch &&
+          podMatch &&
+          polMatch
+        ) {
 
-          selectedPol:
-            request.pol ||
-            String(rate.pol)
-              .split(/[\/,]/)[0]
-              .trim()
-        };
+          return {
+            ...rate,
+
+            container: rate.size,
+            transit: rate.transit_time,
+            total_no_ins:
+              rate.total_without_insurance,
+            total_with_ins:
+              rate.total_with_insurance,
+
+            selectedPol:
+              request.pol ||
+              String(rate.pol)
+                .split(/[\/,]/)[0]
+                .trim()
+          };
+        }
       }
     }
   }
