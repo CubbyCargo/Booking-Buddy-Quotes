@@ -459,17 +459,25 @@ const params =
 
 function portMatches(ratePol, requestedPol) {
 
-  if (!requestedPol) {
+  if (!requestedPorts) {
     return true;
   }
 
-  const ports =
-    String(ratePol || '')
+  const rateList =
+    String(ratePorts || '')
       .split(/[\/,]/)
-      .map(clean);
+      .map(clean)
+      .filter(Boolean);
 
-  return ports.includes(
-    clean(requestedPol)
+  const requestedList =
+    String(requestedPorts || '')
+      .split(/[\/,]/)
+      .map(clean)
+      .filter(Boolean);
+
+  return requestedList.some(
+    requested =>
+      rateList.includes(requested)
   );
 }
 
