@@ -303,6 +303,16 @@
         Prepared for&nbsp;&nbsp;
         <strong id="prepared-for"></strong>
       </div>
+
+      <div>
+        Currency&nbsp;&nbsp;
+        <strong>USD</strong>
+      </div>
+
+      <div class="meta-right">
+        ROE&nbsp;&nbsp;
+        <strong>USD 1.00 = TTD 7.20</strong>
+      </div>
     </div>
 
     <div class="title">
@@ -358,7 +368,7 @@
 
     <div class="insurance-note">
       Marine Insurance covers a C&amp;F value of up to USD $30,000
-      at an additional $200. Ask your Cubby representative to
+      at an additional USD $200. Ask your Cubby representative to
       include it in your booking.
     </div>
 
@@ -401,7 +411,7 @@ function clean(value) {
 
 
 function money(value) {
-  return '$' + Number(value || 0)
+  return 'USD $' + Number(value || 0)
     .toLocaleString(
       'en-US',
       {
