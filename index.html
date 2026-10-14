@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Cubby Cargo Quotation</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f5f7;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #171717;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+
+    .logos {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 8px 22px;
+    }
+
+    .cubby-logo {
+      width: 125px;
+      height: auto;
+    }
+
+    .ramps-logo {
+      width: 125px;
+      height: auto;
+    }
+
+    .blue-line {
+      height: 22px;
+      background: #173b8f;
+      margin-bottom: 25px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      font-size: 13px;
+      margin: 0 8px 35px;
+    }
+
+    .meta-right {
+      text-align: right;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      background: #6d21d9;
+      color: white;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .shipment-table {
+      margin-top: 16px;
+    }
+
+    .shipment-table td {
+      border: 1px solid #e3d7f7;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .shipment-table .label {
+      color: #555;
+      width: 20%;
+    }
+
+    .shipment-table .value {
+      font-weight: 700;
+      width: 30%;
+    }
+
+    .charges-table {
+      margin-top: 15px;
+    }
+
+    .charges-table td {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    .charges-table .amount {
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .base-row td {
+      padding-top: 8px;
+      font-weight: 700;
+    }
+
+    .insurance-row td {
+      font-weight: 700;
+    }
+
+    .total-row {
+      background: #ecfdf3;
+    }
+
+    .total-row td {
+      color: #08a832;
+      font-size: 16px;
+      font-weight: 800;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+
+    .insurance-note {
+      margin-top: 18px;
+      border: 1px solid #32d45b;
+      color: #08a832;
+      padding: 10px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .terms {
+      color: #666;
+      font-size: 9px;
+      line-height: 1.4;
+      margin-top: 25px;
+    }
+
+    .bottom-line {
+      height: 15px;
+      background: #173b8f;
+      margin-top: 14px;
+    }
+
+    .actions {
+      text-align: center;
+      margin: 22px auto 35px;
+    }
+
+    .print-button {
+      border: 0;
+      border-radius: 6px;
+      background: #6d21d9;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 24px;
+      cursor: pointer;
+    }
+
+    .print-button:hover {
+      opacity: .9;
+    }
+
+    .loading,
+    .error {
+      max-width: 700px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 35px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    .error {
+      color: #b00020;
+    }
+
+    #quote {
+      display: none;
+    }
+
+    @media (max-width: 650px) {
+      .page {
+        margin: 0;
+        padding: 18px;
+        box-shadow: none;
+      }
+
+      .logos {
+        padding-top: 8px;
+      }
+
+      .cubby-logo,
+      .ramps-logo {
+        width: 95px;
+      }
+
+      .blue-line {
+        height: 16px;
+      }
+
+      .meta {
+        font-size: 11px;
+      }
+
+      .shipment-table td {
+        padding: 7px;
+        font-size: 10px;
+      }
+
+      .charges-table td {
+        font-size: 11px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .page {
+        margin: 0;
+        width: 100%;
+        max-width: none;
+        box-shadow: none;
+        padding: 18mm 12mm;
+      }
+
+      .actions {
+        display: none !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="loading" class="loading">
+  Preparing your quotation...
+</div>
+
+<div id="error" class="error" style="display:none;"></div>
+
+<div id="quote">
+
+  <div class="page">
+
+    <div class="logos">
+      <img
+        src="cubby-logo.png"
+        class="cubby-logo"
+        alt="Cubby Cargo">
+
+      <img
+        src="Ramps-logo-Google-Docs.png"
+        class="ramps-logo"
+        alt="Ramps Logistics">
+    </div>
+
+    <div class="blue-line"></div>
+
+    <div class="meta">
+      <div>
+        Date&nbsp;&nbsp;
+        <strong id="quote-date"></strong>
+      </div>
+
+      <div class="meta-right">
+        Quote Ref&nbsp;&nbsp;
+        <strong id="quote-ref">Loading...</strong>
+      </div>
+
+      <div>
+        Valid until&nbsp;&nbsp;
+        <strong id="valid-until"></strong>
+      </div>
+
+      <div class="meta-right">
+        Prepared for&nbsp;&nbsp;
+        <strong id="prepared-for"></strong>
+      </div>
+
+      <div>
+        Currency&nbsp;&nbsp;
+        <strong>USD</strong>
+      </div>
+
+      <div class="meta-right">
+        ROE&nbsp;&nbsp;
+        <strong>USD 1.00 = TTD 7.20</strong>
+      </div>
+    </div>
+
+    <div class="title">
+      Commercial Proposal — FCL Freight
+    </div>
+
+    <div class="section-title">
+      SHIPMENT INFO
+    </div>
+
+    <table class="shipment-table">
+      <tr>
+        <td class="label">POL</td>
+        <td class="value" id="pol"></td>
+
+        <td class="label">Carrier</td>
+        <td class="value" id="carrier"></td>
+      </tr>
+
+      <tr>
+        <td class="label">POD</td>
+        <td class="value" id="pod"></td>
+
+        <td class="label">Transit</td>
+        <td class="value" id="transit"></td>
+      </tr>
+
+      <tr>
+        <td class="label">Container</td>
+        <td class="value" id="container"></td>
+
+        <td class="label">Incoterm</td>
+        <td class="value">FOB</td>
+      </tr>
+
+      <tr>
+        <td class="label">Commodity</td>
+        <td class="value" id="commodity"></td>
+
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+
+    <div class="section-title">
+      SURCHARGE BREAKDOWN
+    </div>
+
+    <table
+      class="charges-table"
+      id="charges-table">
+    </table>
+
+    <div class="insurance-note">
+      Marine Insurance covers a C&amp;F value of up to USD $30,000
+      at an additional USD $200. Ask your Cubby representative to
+      include it in your booking.
+    </div>
+
+    <div class="terms">
+      Rates are subject to space and equipment availability.
+      Cargo must be ingated on or before the validity date;
+      updated rates may apply thereafter. Values greater than
+      USD $30,000 and restricted commodities must be quoted on
+      a case-by-case basis. Should client decline Marine
+      Insurance, Ramps Logistics shall not be held liable for
+      any claims, loss or damages arising from the execution
+      of services.
+    </div>
+
+    <div class="bottom-line"></div>
+
+  </div>
+
+  <div class="actions">
+    <button
+      class="print-button"
+      onclick="window.print()">
+      Print / Save as PDF
+    </button>
+  </div>
+
+</div>
+
+
+<script>
+const QUOTE_API = 'https://script.google.com/macros/s/AKfycbyL5XF7erLc_OPVoAHS4mGTENGSDXalSb_ok19K6fVX0Z7ed-RZlnfJ3tw_-HnScV_kxg/exec';
+
+function money(value) {
+  return 'USD $' + Number(value || 0).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function quoteDate(iso) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC'
+  });
+}
+
+function showError(message) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('quote').style.display = 'none';
+  const error = document.getElementById('error');
+  error.textContent = message;
+  error.style.display = 'block';
+}
+
+function setText(id, value) {
+  document.getElementById(id).textContent = value == null || value === '' ? '—' : String(value);
+}
+
+function addChargeRow(table, label, amount, className) {
+  const row = table.insertRow();
+  if (className) row.className = className;
+  const labelCell = row.insertCell();
+  labelCell.textContent = label;
+  const amountCell = row.insertCell();
+  amountCell.className = 'amount';
+  amountCell.textContent = money(amount);
+}
+
+function renderCharges(rate, insuranceIncluded) {
+  const table = document.getElementById('charges-table');
+  table.replaceChildren();
+  for (const [description, amount] of Object.entries(rate.surcharges || {})) {
+    addChargeRow(table, description, amount);
+  }
+  const base = Number(rate.total_without_insurance);
+  const insured = Number(rate.total_with_insurance);
+  addChargeRow(table, 'Base Rate (excl. Marine Insurance)', base, 'base-row');
+  if (insuranceIncluded) {
+    addChargeRow(table, 'Marine Insurance', insured - base, 'insurance-row');
+  }
+  addChargeRow(table, 'Total', insuranceIncluded ? insured : base, 'total-row');
+}
+
+async function loadQuote() {
+  // Only saved quotations can be displayed. Legacy editable URL fields are ignored.
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('q') || '';
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    showError('This quotation link is invalid. Please request a new quotation from Cubby Cargo.');
+    return;
+  }
+
+  try {
+    const response = await fetch(QUOTE_API + '?q=' + encodeURIComponent(token), {
+      cache: 'no-store'
+    });
+    if (!response.ok) throw new Error('Quotation service unavailable');
+    const result = await response.json();
+    if (!result.success || !result.quote) {
+      showError('This quotation could not be found. Please request a new quotation from Cubby Cargo.');
+      return;
+    }
+
+    const quote = result.quote;
+    const rate = quote.rate;
+    if (!rate || !quote.ref || !Number.isFinite(Number(rate.total_without_insurance)) ||
+        !Number.isFinite(Number(rate.total_with_insurance))) {
+      throw new Error('Invalid saved quotation');
+    }
+
+    setText('quote-date', quoteDate(quote.created_at));
+    setText('quote-ref', quote.ref);
+    setText('valid-until', rate.validity);
+    setText('prepared-for', quote.prepared_for);
+    setText('pol', quote.pol);
+    setText('pod', quote.pod);
+    setText('container', quote.container);
+    setText('carrier', quote.carrier);
+    setText('transit', rate.transit_time);
+    setText('commodity', rate.commodity || 'FAK');
+    renderCharges(rate, quote.insurance === true);
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('quote').style.display = 'block';
+  } catch (error) {
+    console.error('Unable to retrieve quotation:', error);
+    showError('We could not load this quotation. Please return to WhatsApp and try again.');
+  }
+}
+
+loadQuote();
+</script>
+
+</body>
+</html>
