@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Quotation Connection Test</title>
+<style>body{font:16px Arial,sans-serif;max-width:650px;margin:40px auto;padding:0 20px;line-height:1.5}input{width:100%;box-sizing:border-box;padding:12px;margin:8px 0}button{padding:12px 18px;cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f4f6;padding:16px}</style></head>
+<body><h2>Cubby quotation connection test</h2><p>Paste a test quotation access token from column H. The token is used only to request your Apps Script endpoint and is not shown in the result.</p>
+<label for="token">Access token</label><input id="token" type="password" autocomplete="off" spellcheck="false"><button id="test">Test connection</button><pre id="result">Ready to test.</pre>
+<script>
+const endpoint='https://script.google.com/macros/s/AKfycbyL5XF7erLc_OPVoAHS4mGTENGSDXalSb_ok19K6fVX0Z7ed-RZlnfJ3tw_-HnScV_kxg/exec';
+document.getElementById('test').addEventListener('click',async()=>{
+ const token=document.getElementById('token').value.trim();
+ const result=document.getElementById('result');
+ if(!token){result.textContent='Please enter a token.';return;}
+ result.textContent='Testing...';
+ try{
+  const response=await fetch(endpoint+'?q='+encodeURIComponent(token),{redirect:'follow',cache:'no-store'});
+  const data=await response.json();
+  result.textContent=JSON.stringify({httpStatus:response.status,success:data.success===true,quotationFound:!!data.quote,reference:data.quote?.ref||null,error:data.error||null},null,2);
+ }catch(error){result.textContent='Browser request failed: '+error.message+'\nThis may indicate a cross-origin (CORS) restriction.';}
+});
+</script></body></html>
